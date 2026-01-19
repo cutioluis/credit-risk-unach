@@ -126,32 +126,7 @@ Asegúrate de que el archivo `data/raw/credit_risk_dataset.csv` esté presente.
 ## Uso del Sistema
 
 ### Paso 1: Procesar Datos y Entrenar Modelo
-
-Ejecuta el siguiente script para procesar los datos y entrenar el modelo:
-
-```python
-# train_model.py (crear este archivo)
-from src.data_processing import DataProcessor
-from src.model import CreditRiskModel
-import joblib
-import config
-
-# 1. Procesar datos
-processor = DataProcessor()
-X_train, X_test, y_train, y_test, df_clean = processor.process_pipeline()
-
-# 2. Entrenar modelo
-model = CreditRiskModel()
-metrics = model.train_and_evaluate_pipeline(
-    X_train, X_test, y_train, y_test,
-    feature_names=processor.feature_names
-)
-
-# 3. Guardar scaler
-joblib.dump(processor.scaler, config.SCALER_FILE)
-print(f"\n✓ Scaler guardado en: {config.SCALER_FILE}")
-```
-
+Entrena el modelo 
 ```bash
 python train_model.py
 ```
@@ -254,4 +229,4 @@ print(top_5_mejores)  # [6.3, 8.2, 9.8, 10.5, 12.1]
 
 ## Autor
 
-Proyecto de Programación y Estructura de Datos - UNACH
+Luis Cutiopala - UNACH
