@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Estadísticas del Dataset</h2>
+            <p>Métricas generales de los datos de crédito</p>
+        </div>
+
+        {% if stats %}
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Registros</h3>
+                <div class="value">{{ "{:,}".format(stats.total_records) }}</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Tasa de Incumplimiento</h3>
+                <div class="value">{{ "%.2f"|format(stats.default_rate * 100) }}%</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Monto Promedio de Préstamo</h3>
+                <div class="value">${{ "{:,.0f}".format(stats.avg_loan_amount) }}</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Tasa de Interés Promedio</h3>
+                <div class="value">{{ "%.2f"|format(stats.avg_interest_rate) }}%</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Ingreso Promedio</h3>
+                <div class="value">${{ "{:,.0f}".format(stats.avg_income) }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Interpretación de las Estadísticas</h3>
+            <ul style="margin-left: 2rem; line-height: 2;">
+                <li>
+                    <strong>Total de Registros:</strong> Número total de solicitudes de crédito en el dataset.
+                </li>
+                <li>
+                    <strong>Tasa de Incumplimiento:</strong> Porcentaje de préstamos que entraron en default.
+                    {% if stats.default_rate > 0.5 %}
+                    <span style="color: #e74c3c;">(Alta tasa de incumplimiento)</span>
+                    {% else %}
+                    <span style="color: #27ae60;">(Tasa de incumplimiento controlada)</span>
+                    {% endif %}
+                </li>
+                <li>
+                    <strong>Monto Promedio de Préstamo:</strong> Valor medio de los préstamos solicitados.
+                </li>
+                <li>
+                    <strong>Tasa de Interés Promedio:</strong> Tasa de interés media aplicada a los préstamos.
+                </li>
+                <li>
+                    <strong>Ingreso Promedio:</strong> Ingreso anual medio de los solicitantes.
+                </li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="card">
+            <p style="text-align: center; color: #e74c3c;">
+                No hay datos disponibles. Por favor, ejecute el pipeline de procesamiento primero.
+            </p>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/dashboard" class="btn btn-primary">Ver Dashboard</a>
+            <a href="/predict" class="btn btn-success" style="margin-left: 1rem;">Hacer Predicción</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System</p>
+    </footer>
+</body>
+</html>

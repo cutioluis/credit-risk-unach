@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Resultado de la Evaluación</h2>
+
+            <div class="result-box {% if prediction.prediction == 1 %}high-risk{% else %}low-risk{% endif %}">
+                <h2>{{ prediction.risk_level }}</h2>
+                <p class="probability">
+                    Probabilidad de Incumplimiento: {{ "%.2f"|format(prediction.probability_default * 100) }}%
+                </p>
+                <p style="margin-top: 1rem; font-size: 1.1rem;">
+                    Confianza: {{ "%.2f"|format(prediction.confidence * 100) }}%
+                </p>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Datos del Solicitante</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Edad</h3>
+                    <div class="value">{{ features.person_age }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Ingreso Anual</h3>
+                    <div class="value">${{ "{:,.0f}".format(features.person_income) }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Monto del Préstamo</h3>
+                    <div class="value">${{ "{:,.0f}".format(features.loan_amnt) }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Tasa de Interés</h3>
+                    <div class="value">{{ "%.2f"|format(features.loan_int_rate) }}%</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Detalles Adicionales</h3>
+            <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>Propiedad de Vivienda:</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.person_home_ownership }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>Años de Empleo:</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.person_emp_length }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>Propósito del Préstamo:</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.loan_intent }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>Grado del Préstamo:</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.loan_grade }}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>% del Ingreso:</strong></td>
+                    <td style="padding: 0.75rem;">{{ "%.2f"|format(features.loan_percent_income * 100) }}%</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 0.75rem;"><strong>Defaults Previos:</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.cb_person_default_on_file }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.75rem;"><strong>Historial Crediticio (años):</strong></td>
+                    <td style="padding: 0.75rem;">{{ features.cb_person_cred_hist_length }}</td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="/predict" class="btn btn-primary">Nueva Predicción</a>
+                <a href="/" class="btn btn-success" style="margin-left: 1rem;">Volver al Inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System</p>
+    </footer>
+</body>
+</html>

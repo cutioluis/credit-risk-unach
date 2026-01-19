@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Prediction System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Bienvenido al Sistema de Credit Risk Prediction</h2>
+            <p>
+                Este sistema utiliza Machine Learning para predecir el riesgo de incumplimiento
+                de préstamos basándose en datos históricos de solicitudes de crédito.
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Predicción</h3>
+                <p>Evalúa el riesgo de una nueva solicitud de crédito</p>
+                <a href="/predict" class="btn btn-primary">Ir a Predicción</a>
+            </div>
+
+            <div class="stat-card">
+                <h3>Dashboard</h3>
+                <p>Visualiza gráficos y análisis de datos</p>
+                <a href="/dashboard" class="btn btn-primary">Ver Dashboard</a>
+            </div>
+
+            <div class="stat-card">
+                <h3>Estadísticas</h3>
+                <p>Consulta métricas generales del dataset</p>
+                <a href="/stats" class="btn btn-primary">Ver Stats</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Características del Sistema</h2>
+            <ul style="margin-left: 2rem; line-height: 2;">
+                <li>Procesamiento y limpieza de datos con técnicas avanzadas</li>
+                <li>Modelo de Machine Learning (Random Forest)</li>
+                <li>Estructuras de datos eficientes (MinHeap, MaxHeap)</li>
+                <li>Visualizaciones interactivas con Plotly</li>
+                <li>Interfaz web intuitiva con Flask</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System - Proyecto de Programación y Estructura de Datos</p>
+    </footer>
+</body>
+</html>

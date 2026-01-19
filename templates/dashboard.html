@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Dashboard de Visualizaciones</h2>
+            <p>Análisis visual de los datos de riesgo crediticio</p>
+        </div>
+
+        {% if plots %}
+            {% for plot in plots %}
+            <div class="plot-container">
+                <div id="plot{{ loop.index }}"></div>
+            </div>
+            {% endfor %}
+
+            <script>
+                // Renderizar todos los gráficos de Plotly
+                {% for plot in plots %}
+                var plotData{{ loop.index }} = {{ plot|safe }};
+                Plotly.newPlot('plot{{ loop.index }}', plotData{{ loop.index }}.data, plotData{{ loop.index }}.layout);
+                {% endfor %}
+            </script>
+        {% else %}
+            <div class="card">
+                <p style="text-align: center; color: #e74c3c;">
+                    No hay datos procesados disponibles. Por favor, ejecute el pipeline de procesamiento primero.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System</p>
+    </footer>
+</body>
+</html>

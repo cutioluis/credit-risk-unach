@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Riesgo - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Evaluación de Riesgo Crediticio</h2>
+            <p>Complete el formulario con los datos del solicitante para obtener una predicción de riesgo.</p>
+
+            <form method="POST" action="/predict">
+                <h3 style="margin-top: 2rem; color: #2c3e50;">Datos Personales</h3>
+
+                <div class="form-group">
+                    <label for="person_age">Edad:</label>
+                    <input type="number" id="person_age" name="person_age" required min="18" max="100" value="30">
+                </div>
+
+                <div class="form-group">
+                    <label for="person_income">Ingreso Anual ($):</label>
+                    <input type="number" id="person_income" name="person_income" required min="0" step="0.01" value="50000">
+                </div>
+
+                <div class="form-group">
+                    <label for="person_home_ownership">Propiedad de Vivienda:</label>
+                    <select id="person_home_ownership" name="person_home_ownership" required>
+                        <option value="RENT">Alquiler</option>
+                        <option value="MORTGAGE">Hipoteca</option>
+                        <option value="OWN">Propia</option>
+                        <option value="OTHER">Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="person_emp_length">Años de Empleo:</label>
+                    <input type="number" id="person_emp_length" name="person_emp_length" required min="0" step="0.1" value="5">
+                </div>
+
+                <h3 style="margin-top: 2rem; color: #2c3e50;">Datos del Préstamo</h3>
+
+                <div class="form-group">
+                    <label for="loan_intent">Propósito del Préstamo:</label>
+                    <select id="loan_intent" name="loan_intent" required>
+                        <option value="PERSONAL">Personal</option>
+                        <option value="EDUCATION">Educación</option>
+                        <option value="MEDICAL">Médico</option>
+                        <option value="VENTURE">Negocio</option>
+                        <option value="HOMEIMPROVEMENT">Mejora del Hogar</option>
+                        <option value="DEBTCONSOLIDATION">Consolidación de Deuda</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_grade">Grado del Préstamo:</label>
+                    <select id="loan_grade" name="loan_grade" required>
+                        <option value="A">A (Mejor)</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="G">G (Peor)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_amnt">Monto del Préstamo ($):</label>
+                    <input type="number" id="loan_amnt" name="loan_amnt" required min="0" step="0.01" value="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_int_rate">Tasa de Interés (%):</label>
+                    <input type="number" id="loan_int_rate" name="loan_int_rate" required min="0" max="100" step="0.01" value="10.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_percent_income">Préstamo como % del Ingreso:</label>
+                    <input type="number" id="loan_percent_income" name="loan_percent_income" required min="0" max="1" step="0.01" value="0.2">
+                </div>
+
+                <h3 style="margin-top: 2rem; color: #2c3e50;">Historial Crediticio</h3>
+
+                <div class="form-group">
+                    <label for="cb_person_default_on_file">¿Tiene defaults previos?</label>
+                    <select id="cb_person_default_on_file" name="cb_person_default_on_file" required>
+                        <option value="N">No</option>
+                        <option value="Y">Sí</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cb_person_cred_hist_length">Años de Historial Crediticio:</label>
+                    <input type="number" id="cb_person_cred_hist_length" name="cb_person_cred_hist_length" required min="0" value="5">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Evaluar Riesgo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System</p>
+    </footer>
+</body>
+</html>

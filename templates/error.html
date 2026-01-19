@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/stats">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2 style="color: #e74c3c;">Error</h2>
+            <p>Ha ocurrido un error al procesar su solicitud:</p>
+            <div style="background-color: #f8d7da; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #e74c3c;">
+                <code>{{ error }}</code>
+            </div>
+
+            <h3>Posibles Soluciones:</h3>
+            <ul style="margin-left: 2rem; line-height: 2;">
+                <li>Verifique que el modelo haya sido entrenado correctamente</li>
+                <li>Asegúrese de que los datos procesados existan</li>
+                <li>Compruebe que todos los campos del formulario estén completos</li>
+                <li>Intente recargar la página</li>
+            </ul>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/" class="btn btn-primary">Volver al Inicio</a>
+                <a href="/predict" class="btn btn-success" style="margin-left: 1rem;">Intentar Nuevamente</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Credit Risk Prediction System</p>
+    </footer>
+</body>
+</html>
