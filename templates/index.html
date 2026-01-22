@@ -1,68 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Risk Prediction System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <header>
-        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
-    </header>
 
-    <nav>
-        <ul>
+<body>
+    <nav class="container-navbar">
+        <ul class="navbar-section">
             <li><a href="/">Inicio</a></li>
-            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/predict">Hacer Prediccion</a></li>
             <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/stats">Estadísticas</a></li>
+            <li><a href="/stats">Estadisticas</a></li>
         </ul>
     </nav>
-
-    <div class="container">
-        <div class="card">
-            <h2>Bienvenido al Sistema de Credit Risk Prediction</h2>
-            <p>
-                Este sistema utiliza Machine Learning para predecir el riesgo de incumplimiento
-                de préstamos basándose en datos históricos de solicitudes de crédito.
-            </p>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Predicción</h3>
-                <p>Evalúa el riesgo de una nueva solicitud de crédito</p>
-                <a href="/predict" class="btn btn-primary">Ir a Predicción</a>
+    <main>
+        <!-- Sección Cover -->
+        <section class="cover-section">
+            <div class="cover-container">
+                <img src="{{ url_for('static', filename='assets/cover-main.png') }}" alt="Cover Principal">
+                <div class="cover-text">
+                    <h1>
+                        Sistema de Prediccion de<br>
+                        <span class="highlight">Riesgo Crediticio</span>
+                    </h1>
+                    <p class="cover-subtitle">
+                        <strong>Impulsa tus decisiones crediticias con IA</strong><br>
+                        Anticipa el comportamiento de los clientes y reduce el riesgo con modelos inteligentes.
+                    </p>
+                </div>
             </div>
+        </section>
 
-            <div class="stat-card">
-                <h3>Dashboard</h3>
-                <p>Visualiza gráficos y análisis de datos</p>
-                <a href="/dashboard" class="btn btn-primary">Ver Dashboard</a>
-            </div>
+        <!-- Sección Botones de Navegación -->
+        <section class="nav-buttons-section">
+            <a href="/dashboard" class="nav-btn">
+                <img src="{{ url_for('static', filename='assets/graficas.png') }}" alt="Graficas">
+                <span>Dashboard</span>
+            </a>
+            <a href="/predict" class="nav-btn nav-btn-gradient">
+                <img src="{{ url_for('static', filename='assets/predit.png') }}" alt="Prediccion">
+                <span>Prediccion</span>
+            </a>
+            <a href="/stats" class="nav-btn">
+                <img src="{{ url_for('static', filename='assets/stats.png') }}" alt="Estadisticas">
+                <span>Estadisticas</span>
+            </a>
+        </section>
+    </main>
 
-            <div class="stat-card">
-                <h3>Estadísticas</h3>
-                <p>Consulta métricas generales del dataset</p>
-                <a href="/stats" class="btn btn-primary">Ver Stats</a>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Características del Sistema</h2>
-            <ul style="margin-left: 2rem; line-height: 2;">
-                <li>Procesamiento y limpieza de datos con técnicas avanzadas</li>
-                <li>Modelo de Machine Learning (Random Forest)</li>
-                <li>Estructuras de datos eficientes (MinHeap, MaxHeap)</li>
-                <li>Visualizaciones interactivas con Plotly</li>
-                <li>Interfaz web intuitiva con Flask</li>
-            </ul>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 Credit Risk Prediction System - Proyecto de Programación y Estructura de Datos</p>
+    <footer class="index-footer">
+        <p>Made with <span class="heart">&#10084;</span> by <strong>Grupo 5</strong></p>
+        <p class="footer-university">UNACH · Ciencia de Datos e Inteligencia Artificial</p>
     </footer>
 </body>
+
 </html>

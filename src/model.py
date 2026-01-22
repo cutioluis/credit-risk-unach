@@ -81,14 +81,14 @@ class CreditRiskModel:
         }
 
         # Mostrar métricas
-        print("\n📊 Métricas de Evaluación:")
+        print("\n Métricas de Evaluación:")
         print(f"  • Accuracy:  {self.metrics['accuracy']:.4f}")
         print(f"  • Precision: {self.metrics['precision']:.4f}")
         print(f"  • Recall:    {self.metrics['recall']:.4f}")
         print(f"  • F1-Score:  {self.metrics['f1_score']:.4f}")
         print(f"  • ROC-AUC:   {self.metrics['roc_auc']:.4f}")
 
-        print("\n📋 Matriz de Confusión:")
+        print("\n Matriz de Confusión:")
         cm = self.metrics['confusion_matrix']
         print(f"  TN: {cm[0][0]:<6} FP: {cm[0][1]:<6}")
         print(f"  FN: {cm[1][0]:<6} TP: {cm[1][1]:<6}")
@@ -114,7 +114,7 @@ class CreditRiskModel:
             'importance': importances
         }).sort_values('importance', ascending=False)
 
-        print("\n📈 Top 5 Features más importantes:")
+        print("\n Top 5 Features más importantes:")
         for idx, row in self.feature_importance.head().iterrows():
             print(f"  {row['feature']:<30} {row['importance']:.4f}")
 

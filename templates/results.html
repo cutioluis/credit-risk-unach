@@ -1,100 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados - Credit Risk System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <header>
-        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
-    </header>
 
-    <nav>
-        <ul>
+<body>
+    <nav class="container-navbar">
+        <ul class="navbar-section">
             <li><a href="/">Inicio</a></li>
-            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/predict">Hacer Prediccion</a></li>
             <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/stats">Estadísticas</a></li>
+            <li><a href="/stats">Estadisticas</a></li>
         </ul>
     </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Resultado de la Evaluación</h2>
+    <main class="results-main">
+        <!-- Header -->
+        <section class="results-header">
+            <h1>Resultado de la <span class="highlight-blue">Evaluacion</span></h1>
+            <p class="results-subtitle">Analisis de riesgo crediticio completado</p>
+        </section>
 
-            <div class="result-box {% if prediction.prediction == 1 %}high-risk{% else %}low-risk{% endif %}">
-                <h2>{{ prediction.risk_level }}</h2>
-                <p class="probability">
-                    Probabilidad de Incumplimiento: {{ "%.2f"|format(prediction.probability_default * 100) }}%
-                </p>
-                <p style="margin-top: 1rem; font-size: 1.1rem;">
-                    Confianza: {{ "%.2f"|format(prediction.confidence * 100) }}%
-                </p>
+        <!-- Resultado Principal -->
+        <section class="result-card {{ 'result-high-risk' if prediction.prediction == 1 else 'result-low-risk' }}">
+            <div class="result-icon">
+                {% if prediction.prediction == 1 %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                {% endif %}
+            </div>
+            <h2 class="result-level">{{ prediction.risk_level }}</h2>
+            <p class="result-description">
+                {% if prediction.prediction == 1 %}
+                El solicitante presenta indicadores de riesgo elevado
+                {% else %}
+                El solicitante presenta un perfil crediticio favorable
+                {% endif %}
+            </p>
+        </section>
+
+        <!-- Métricas de Probabilidad -->
+        <section class="probability-cards">
+            <div class="prob-card">
+                <div class="prob-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    </svg>
+                    <span>Probabilidad de Incumplimiento</span>
+                </div>
+                <div class="prob-value {{ 'prob-high' if prediction.probability_default > 0.5 else 'prob-low' }}">
+                    {{ "%.1f"|format(prediction.probability_default * 100) }}%
+                </div>
+                <div class="prob-bar">
+                    <div class="prob-fill {{ 'fill-high' if prediction.probability_default > 0.5 else 'fill-low' }}" style="width: {{ prediction.probability_default * 100 }}%"></div>
+                </div>
             </div>
 
-            <h3 style="margin-top: 2rem;">Datos del Solicitante</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Edad</h3>
-                    <div class="value">{{ features.person_age }}</div>
+            <div class="prob-card">
+                <div class="prob-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Confianza del Modelo</span>
                 </div>
-                <div class="stat-card">
-                    <h3>Ingreso Anual</h3>
-                    <div class="value">${{ "{:,.0f}".format(features.person_income) }}</div>
+                <div class="prob-value prob-neutral">
+                    {{ "%.1f"|format(prediction.confidence * 100) }}%
                 </div>
-                <div class="stat-card">
-                    <h3>Monto del Préstamo</h3>
-                    <div class="value">${{ "{:,.0f}".format(features.loan_amnt) }}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Tasa de Interés</h3>
-                    <div class="value">{{ "%.2f"|format(features.loan_int_rate) }}%</div>
+                <div class="prob-bar">
+                    <div class="prob-fill fill-neutral" style="width: {{ prediction.confidence * 100 }}%"></div>
                 </div>
             </div>
+        </section>
 
-            <h3 style="margin-top: 2rem;">Detalles Adicionales</h3>
-            <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>Propiedad de Vivienda:</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.person_home_ownership }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>Años de Empleo:</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.person_emp_length }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>Propósito del Préstamo:</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.loan_intent }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>Grado del Préstamo:</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.loan_grade }}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>% del Ingreso:</strong></td>
-                    <td style="padding: 0.75rem;">{{ "%.2f"|format(features.loan_percent_income * 100) }}%</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 0.75rem;"><strong>Defaults Previos:</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.cb_person_default_on_file }}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 0.75rem;"><strong>Historial Crediticio (años):</strong></td>
-                    <td style="padding: 0.75rem;">{{ features.cb_person_cred_hist_length }}</td>
-                </tr>
-            </table>
+        <!-- Resumen del Solicitante -->
+        <section class="applicant-section">
+            <h3 class="section-title">Datos del <span class="highlight-blue">Solicitante</span></h3>
 
-            <div style="margin-top: 2rem; text-align: center;">
-                <a href="/predict" class="btn btn-primary">Nueva Predicción</a>
-                <a href="/" class="btn btn-success" style="margin-left: 1rem;">Volver al Inicio</a>
+            <div class="applicant-grid">
+                <div class="applicant-card">
+                    <div class="applicant-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <span class="applicant-label">Edad</span>
+                    <span class="applicant-value">{{ features.person_age }} anos</span>
+                </div>
+
+                <div class="applicant-card">
+                    <div class="applicant-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <span class="applicant-label">Ingreso Anual</span>
+                    <span class="applicant-value">${{ "{:,.0f}".format(features.person_income) }}</span>
+                </div>
+
+                <div class="applicant-card">
+                    <div class="applicant-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <span class="applicant-label">Monto Prestamo</span>
+                    <span class="applicant-value">${{ "{:,.0f}".format(features.loan_amnt) }}</span>
+                </div>
+
+                <div class="applicant-card">
+                    <div class="applicant-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <span class="applicant-label">Tasa Interes</span>
+                    <span class="applicant-value">{{ "%.2f"|format(features.loan_int_rate) }}%</span>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <footer>
-        <p>&copy; 2026 Credit Risk Prediction System</p>
+        <!-- Detalles Adicionales -->
+        <section class="details-section">
+            <h3 class="section-title">Detalles <span class="highlight-blue">Adicionales</span></h3>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Propiedad de Vivienda</span>
+                    <span class="detail-value">{{ features.person_home_ownership }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Anos de Empleo</span>
+                    <span class="detail-value">{{ features.person_emp_length }} anos</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Proposito del Prestamo</span>
+                    <span class="detail-value">{{ features.loan_intent }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Grado del Prestamo</span>
+                    <span class="detail-value detail-grade">{{ features.loan_grade }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Prestamo / Ingreso</span>
+                    <span class="detail-value">{{ "%.1f"|format(features.loan_percent_income * 100) }}%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Defaults Previos</span>
+                    <span class="detail-value {{ 'detail-warning' if features.cb_person_default_on_file == 'Y' else 'detail-success' }}">
+                        {{ 'Si' if features.cb_person_default_on_file == 'Y' else 'No' }}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Historial Crediticio</span>
+                    <span class="detail-value">{{ features.cb_person_cred_hist_length }} anos</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Acciones -->
+        <section class="results-actions">
+            <a href="/predict" class="nav-btn nav-btn-gradient">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Nueva Prediccion</span>
+            </a>
+            <a href="/" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>Volver al Inicio</span>
+            </a>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Credit Risk Prediction System</p>
     </footer>
 </body>
+
 </html>

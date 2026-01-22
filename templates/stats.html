@@ -1,100 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas - Credit Risk System</title>
+    <title>Estadisticas - Credit Risk System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <header>
-        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
-    </header>
 
-    <nav>
-        <ul>
+<body>
+    <nav class="container-navbar">
+        <ul class="navbar-section">
             <li><a href="/">Inicio</a></li>
-            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/predict">Hacer Prediccion</a></li>
             <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/stats">Estadísticas</a></li>
+            <li><a href="/stats">Estadisticas</a></li>
         </ul>
     </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Estadísticas del Dataset</h2>
-            <p>Métricas generales de los datos de crédito</p>
-        </div>
+    <main class="stats-main">
+        <!-- Header de la página -->
+        <section class="stats-header">
+            <h1>Estadisticas del <span class="highlight">Dataset</span></h1>
+            <p class="stats-subtitle">Metricas generales de los datos de credito analizados</p>
+        </section>
 
         {% if stats %}
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total de Registros</h3>
-                <div class="value">{{ "{:,}".format(stats.total_records) }}</div>
-            </div>
+        <!-- Tarjetas de estadísticas -->
+        <section class="stats-cards">
+            <article class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h3>Total Registros</h3>
+                <p class="stat-value">{{ "{:,}".format(stats.total_records) }}</p>
+                <span class="stat-label">solicitudes analizadas</span>
+            </article>
 
-            <div class="stat-card">
+            <article class="stat-card {{ 'stat-warning' if stats.default_rate > 0.3 else 'stat-success' }}">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
                 <h3>Tasa de Incumplimiento</h3>
-                <div class="value">{{ "%.2f"|format(stats.default_rate * 100) }}%</div>
-            </div>
+                <p class="stat-value">{{ "%.2f"|format(stats.default_rate * 100) }}%</p>
+                <span class="stat-label">
+                    {% if stats.default_rate > 0.3 %}riesgo elevado{% else %}riesgo controlado{% endif %}
+                </span>
+            </article>
 
-            <div class="stat-card">
-                <h3>Monto Promedio de Préstamo</h3>
-                <div class="value">${{ "{:,.0f}".format(stats.avg_loan_amount) }}</div>
-            </div>
+            <article class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <h3>Prestamo Promedio</h3>
+                <p class="stat-value">${{ "{:,.0f}".format(stats.avg_loan_amount) }}</p>
+                <span class="stat-label">monto solicitado</span>
+            </article>
 
-            <div class="stat-card">
-                <h3>Tasa de Interés Promedio</h3>
-                <div class="value">{{ "%.2f"|format(stats.avg_interest_rate) }}%</div>
-            </div>
+            <article class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <h3>Tasa Interes Promedio</h3>
+                <p class="stat-value">{{ "%.2f"|format(stats.avg_interest_rate) }}%</p>
+                <span class="stat-label">interes anual</span>
+            </article>
 
-            <div class="stat-card">
+            <article class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                </div>
                 <h3>Ingreso Promedio</h3>
-                <div class="value">${{ "{:,.0f}".format(stats.avg_income) }}</div>
-            </div>
-        </div>
+                <p class="stat-value">${{ "{:,.0f}".format(stats.avg_income) }}</p>
+                <span class="stat-label">ingreso anual</span>
+            </article>
+        </section>
 
-        <div class="card">
-            <h3>Interpretación de las Estadísticas</h3>
-            <ul style="margin-left: 2rem; line-height: 2;">
-                <li>
-                    <strong>Total de Registros:</strong> Número total de solicitudes de crédito en el dataset.
-                </li>
-                <li>
-                    <strong>Tasa de Incumplimiento:</strong> Porcentaje de préstamos que entraron en default.
-                    {% if stats.default_rate > 0.5 %}
-                    <span style="color: #e74c3c;">(Alta tasa de incumplimiento)</span>
-                    {% else %}
-                    <span style="color: #27ae60;">(Tasa de incumplimiento controlada)</span>
-                    {% endif %}
-                </li>
-                <li>
-                    <strong>Monto Promedio de Préstamo:</strong> Valor medio de los préstamos solicitados.
-                </li>
-                <li>
-                    <strong>Tasa de Interés Promedio:</strong> Tasa de interés media aplicada a los préstamos.
-                </li>
-                <li>
-                    <strong>Ingreso Promedio:</strong> Ingreso anual medio de los solicitantes.
-                </li>
-            </ul>
-        </div>
+        <!-- Sección de interpretación -->
+        <section class="stats-interpretation">
+            <h2>Interpretacion de los <span class="highlight">Datos</span></h2>
+
+            <div class="interpretation-grid">
+                <div class="interpretation-card">
+                    <h4>Total de Registros</h4>
+                    <p>Numero total de solicitudes de credito procesadas en el dataset para entrenar el modelo.</p>
+                </div>
+
+                <div class="interpretation-card">
+                    <h4>Tasa de Incumplimiento</h4>
+                    <p>Porcentaje de prestamos que entraron en default.
+                        {% if stats.default_rate > 0.3 %}
+                        <span class="badge badge-warning">Alta tasa de riesgo</span>
+                        {% else %}
+                        <span class="badge badge-success">Tasa controlada</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="interpretation-card">
+                    <h4>Monto Promedio</h4>
+                    <p>Valor medio de los prestamos solicitados por los clientes en el historico.</p>
+                </div>
+
+                <div class="interpretation-card">
+                    <h4>Tasa de Interes</h4>
+                    <p>Tasa de interes media aplicada a los prestamos segun el perfil de riesgo.</p>
+                </div>
+            </div>
+        </section>
+
         {% else %}
-        <div class="card">
-            <p style="text-align: center; color: #e74c3c;">
-                No hay datos disponibles. Por favor, ejecute el pipeline de procesamiento primero.
-            </p>
-        </div>
+        <!-- Estado vacío -->
+        <section class="stats-empty">
+            <div class="empty-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+            <h3>No hay datos disponibles</h3>
+            <p>Ejecuta el pipeline de procesamiento primero para ver las estadisticas.</p>
+            <div class="empty-actions">
+                <a href="/" class="btn-secondary">Ir al Inicio</a>
+                <a href="/predict" class="btn-primary">Hacer Prediccion</a>
+            </div>
+        </section>
         {% endif %}
 
-        <div style="text-align: center; margin-top: 2rem;">
-            <a href="/dashboard" class="btn btn-primary">Ver Dashboard</a>
-            <a href="/predict" class="btn btn-success" style="margin-left: 1rem;">Hacer Predicción</a>
-        </div>
-    </div>
+        <!-- Navegación inferior -->
+        <section class="stats-navigation">
+            <a href="/dashboard" class="nav-btn">
+                <span>Ver Dashboard</span>
+            </a>
+            <a href="/predict" class="nav-btn nav-btn-gradient">
+                <span>Hacer Prediccion</span>
+            </a>
+        </section>
+    </main>
 
-    <footer>
-        <p>&copy; 2026 Credit Risk Prediction System</p>
+    <footer class="main-footer">
+        <p>&copy; 2025 Credit Risk Prediction System</p>
     </footer>
 </body>
+
 </html>

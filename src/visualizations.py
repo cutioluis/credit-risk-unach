@@ -387,30 +387,33 @@ class CreditRiskVisualizer:
         """
         figures = []
 
-        # 1. Distribución de defaults
-        figures.append(self.plot_default_distribution(df))
-
-        # 2. Histogramas de variables numéricas importantes
+        # 1. Histogramas de variables numéricas importantes
         numeric_cols = ['person_age', 'person_income', 'loan_amnt', 'loan_int_rate']
         for col in numeric_cols:
             if col in df.columns:
                 figures.append(self.plot_histogram_by_target(df, col))
 
-        # 3. Scatter plots
+        # 2. Scatter plots
         figures.append(self.plot_scatter(
             df, 'person_income', 'loan_amnt', 'loan_status',
             title="Monto del Préstamo vs Ingreso"
         ))
 
-        # 4. Box plots
+        figures.append(self.plot_scatter(
+            df, 'person_age', 'loan_int_rate', 'loan_status',
+            title="Tasa de Interés vs Edad"
+        ))
+
+        # 3. Box plots
         figures.append(self.plot_boxplot(
             df, 'loan_int_rate', 'loan_status',
             title="Tasa de Interés por Estado de Préstamo"
         ))
 
-        # 5. Matriz de confusión (si hay métricas)
-        if metrics and 'confusion_matrix' in metrics:
-            figures.append(self.plot_confusion_matrix(metrics['confusion_matrix']))
+        figures.append(self.plot_boxplot(
+            df, 'loan_amnt', 'loan_status',
+            title="Monto del Préstamo por Estado"
+        ))
 
         return figures
 

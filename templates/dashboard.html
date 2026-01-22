@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,51 +8,159 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
-<body>
-    <header>
-        <h1>Sistema de Predicción de Riesgo Crediticio</h1>
-    </header>
 
-    <nav>
-        <ul>
+<body>
+    <nav class="container-navbar">
+        <ul class="navbar-section">
             <li><a href="/">Inicio</a></li>
-            <li><a href="/predict">Hacer Predicción</a></li>
+            <li><a href="/predict">Hacer Prediccion</a></li>
             <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/stats">Estadísticas</a></li>
+            <li><a href="/stats">Estadisticas</a></li>
         </ul>
     </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Dashboard de Visualizaciones</h2>
-            <p>Análisis visual de los datos de riesgo crediticio</p>
-        </div>
+    <main class="dashboard-main">
+        <!-- Header -->
+        <section class="dashboard-header">
+            <div class="dashboard-title-section">
+                <h1>Dashboard de <span class="highlight-blue">Visualizaciones</span></h1>
+                <p class="dashboard-subtitle">Analisis visual de los datos de riesgo crediticio</p>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="/predict" class="nav-btn nav-btn-gradient">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Nueva Prediccion</span>
+                </a>
+                <a href="/stats" class="nav-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Ver Estadisticas</span>
+                </a>
+            </div>
+        </section>
 
         {% if plots %}
-            {% for plot in plots %}
-            <div class="plot-container">
-                <div id="plot{{ loop.index }}"></div>
+        <!-- Indicador de Gráficos -->
+        <section class="dashboard-indicators">
+            <div class="indicator-card">
+                <div class="indicator-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                </div>
+                <span class="indicator-label">Graficos</span>
+                <span class="indicator-value">{{ plots|length }}</span>
             </div>
+        </section>
+
+        <!-- Grid de Gráficos -->
+        <section class="charts-grid">
+            {% for plot in plots %}
+            <article class="chart-card">
+                <div class="chart-container" id="plot{{ loop.index }}"></div>
+            </article>
+            {% endfor %}
+        </section>
+
+        <script>
+            var config = {
+                responsive: true,
+                displayModeBar: false,
+                displaylogo: false
+            };
+
+            // Estilo oscuro para los gráficos (responsive)
+            var darkLayout = {
+                paper_bgcolor: 'rgba(35, 38, 90, 0.5)',
+                plot_bgcolor: 'rgba(35, 38, 90, 0.3)',
+                font: {
+                    family: 'Montserrat, sans-serif',
+                    color: '#ffffff',
+                    size: 11
+                },
+                xaxis: {
+                    gridcolor: 'rgba(255, 255, 255, 0.1)',
+                    zerolinecolor: 'rgba(255, 255, 255, 0.2)'
+                },
+                yaxis: {
+                    gridcolor: 'rgba(255, 255, 255, 0.1)',
+                    zerolinecolor: 'rgba(255, 255, 255, 0.2)'
+                },
+                margin: { t: 40, r: 20, b: 40, l: 50 },
+                autosize: true,
+                height: 300
+            };
+
+            {% for plot in plots %}
+            var plotData{{ loop.index }} = {{ plot|safe }};
+            // Combinar layout: quitar width/height fijos y aplicar estilos oscuros
+            var originalLayout{{ loop.index }} = plotData{{ loop.index }}.layout || {};
+            delete originalLayout{{ loop.index }}.width;
+            delete originalLayout{{ loop.index }}.height;
+            var combinedLayout{{ loop.index }} = Object.assign({}, originalLayout{{ loop.index }}, darkLayout);
+            Plotly.newPlot('plot{{ loop.index }}', plotData{{ loop.index }}.data, combinedLayout{{ loop.index }}, config);
             {% endfor %}
 
-            <script>
-                // Renderizar todos los gráficos de Plotly
+            // Redimensionar gráficos cuando cambia el tamaño de ventana
+            window.addEventListener('resize', function() {
                 {% for plot in plots %}
-                var plotData{{ loop.index }} = {{ plot|safe }};
-                Plotly.newPlot('plot{{ loop.index }}', plotData{{ loop.index }}.data, plotData{{ loop.index }}.layout);
+                Plotly.Plots.resize('plot{{ loop.index }}');
                 {% endfor %}
-            </script>
-        {% else %}
-            <div class="card">
-                <p style="text-align: center; color: #e74c3c;">
-                    No hay datos procesados disponibles. Por favor, ejecute el pipeline de procesamiento primero.
-                </p>
-            </div>
-        {% endif %}
-    </div>
+            });
+        </script>
 
-    <footer>
-        <p>&copy; 2026 Credit Risk Prediction System</p>
+        {% else %}
+        <!-- Estado Vacío -->
+        <section class="dashboard-empty">
+            <div class="empty-container">
+                <div class="empty-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h3>No hay datos disponibles</h3>
+                <p>No hay datos procesados para mostrar visualizaciones.<br>Ejecuta el pipeline de procesamiento primero.</p>
+                <div class="empty-actions">
+                    <a href="/" class="btn-secondary">Ir al Inicio</a>
+                    <a href="/predict" class="btn-primary">Hacer Prediccion</a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Navegación inferior -->
+        <section class="dashboard-navigation">
+            <a href="/stats" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Ver Estadisticas</span>
+            </a>
+            <a href="/predict" class="nav-btn nav-btn-gradient">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>Nueva Prediccion</span>
+            </a>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Credit Risk Prediction System</p>
     </footer>
 </body>
+
 </html>

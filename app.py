@@ -154,3 +154,4 @@ if __name__ == '__main__':
         port=config.PORT,
         debug=config.DEBUG
     )
+""" Agregar modelo para hacer predicciones """
