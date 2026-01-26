@@ -23,11 +23,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Data files
-data/raw/*.csv
-data/processed/*.csv
-data/interim/
-
 # Models
 models/*.pkl
 models/*.joblib
