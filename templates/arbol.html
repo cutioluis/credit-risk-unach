@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbol de Busqueda - Credit Risk System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    <nav class="container-navbar">
+        <ul class="navbar-section">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/predict">Hacer Prediccion</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/arbol">Arbol BST</a></li>
+            <li><a href="/stats">Estadisticas</a></li>
+        </ul>
+    </nav>
+
+    <main class="bst-main">
+        <!-- Header -->
+        <section class="bst-header">
+            <div class="bst-title-section">
+                <h1>Arbol Binario de <span class="highlight-blue">Busqueda</span></h1>
+                <p class="bst-subtitle">Visualizacion interactiva del BST ordenado por Score de Riesgo Crediticio</p>
+            </div>
+        </section>
+
+        {% if tree_data %}
+        <!-- Estadisticas del Arbol -->
+        <section class="bst-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h3>Total Nodos</h3>
+                <p class="stat-value">{{ stats.total_nodes }}</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <h3>Altura del Arbol</h3>
+                <p class="stat-value">{{ stats.height }}</p>
+            </div>
+            <div class="stat-card stat-success">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <h3>Riesgo Minimo</h3>
+                <p class="stat-value">{{ stats.min_risk }}</p>
+            </div>
+            <div class="stat-card stat-warning">
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <h3>Riesgo Maximo</h3>
+                <p class="stat-value">{{ stats.max_risk }}</p>
+            </div>
+        </section>
+
+        <!-- Visualizacion del Arbol -->
+        <section class="bst-visualization">
+            <div class="viz-header">
+                <h2>Visualizacion del Arbol</h2>
+                <p>Cada nodo representa un cliente ordenado por su score de riesgo crediticio</p>
+            </div>
+            <div class="tree-container" id="tree-visualization"></div>
+            <div class="tree-legend">
+                <div class="legend-item">
+                    <span class="legend-color legend-low"></span>
+                    <span>Riesgo Bajo (0-30)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color legend-medium"></span>
+                    <span>Riesgo Medio (31-70)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color legend-high"></span>
+                    <span>Riesgo Alto (71-100)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recorridos del Arbol -->
+        <section class="bst-traversals">
+            <h2>Recorridos del Arbol</h2>
+            <p class="section-description">Diferentes formas de visitar todos los nodos del arbol</p>
+
+            <div class="traversal-tabs">
+                <button class="tab-btn active" data-tab="inorder">Inorder</button>
+                <button class="tab-btn" data-tab="preorder">Preorder</button>
+                <button class="tab-btn" data-tab="postorder">Postorder</button>
+                <button class="tab-btn" data-tab="levelorder">Por Niveles</button>
+            </div>
+
+            <div class="traversal-content">
+                <div class="traversal-panel active" id="inorder">
+                    <div class="traversal-info">
+                        <h3>Recorrido Inorder (Izquierda - Raiz - Derecha)</h3>
+                        <p>Visita los nodos en <strong>orden ascendente</strong>. Ideal para obtener datos ordenados.</p>
+                        <span class="complexity-badge">Complejidad: O(n)</span>
+                    </div>
+                    <div class="traversal-result">
+                        {% for score, data in traversals.inorder[:20] %}
+                        <span class="node-badge {% if score <= 30 %}badge-low{% elif score <= 70 %}badge-medium{% else %}badge-high{% endif %}">
+                            {{ score }}
+                        </span>
+                        {% endfor %}
+                        {% if traversals.inorder|length > 20 %}
+                        <span class="more-badge">+{{ traversals.inorder|length - 20 }} mas</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="traversal-panel" id="preorder">
+                    <div class="traversal-info">
+                        <h3>Recorrido Preorder (Raiz - Izquierda - Derecha)</h3>
+                        <p>Visita la raiz primero. Util para <strong>copiar el arbol</strong> o serializar su estructura.</p>
+                        <span class="complexity-badge">Complejidad: O(n)</span>
+                    </div>
+                    <div class="traversal-result">
+                        {% for score, data in traversals.preorder[:20] %}
+                        <span class="node-badge {% if score <= 30 %}badge-low{% elif score <= 70 %}badge-medium{% else %}badge-high{% endif %}">
+                            {{ score }}
+                        </span>
+                        {% endfor %}
+                        {% if traversals.preorder|length > 20 %}
+                        <span class="more-badge">+{{ traversals.preorder|length - 20 }} mas</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="traversal-panel" id="postorder">
+                    <div class="traversal-info">
+                        <h3>Recorrido Postorder (Izquierda - Derecha - Raiz)</h3>
+                        <p>Visita la raiz al final. Util para <strong>eliminar el arbol</strong> de forma segura.</p>
+                        <span class="complexity-badge">Complejidad: O(n)</span>
+                    </div>
+                    <div class="traversal-result">
+                        {% for score, data in traversals.postorder[:20] %}
+                        <span class="node-badge {% if score <= 30 %}badge-low{% elif score <= 70 %}badge-medium{% else %}badge-high{% endif %}">
+                            {{ score }}
+                        </span>
+                        {% endfor %}
+                        {% if traversals.postorder|length > 20 %}
+                        <span class="more-badge">+{{ traversals.postorder|length - 20 }} mas</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="traversal-panel" id="levelorder">
+                    <div class="traversal-info">
+                        <h3>Recorrido por Niveles (BFS)</h3>
+                        <p>Visita nivel por nivel. Util para <strong>busqueda en anchura</strong> y visualizacion.</p>
+                        <span class="complexity-badge">Complejidad: O(n)</span>
+                    </div>
+                    <div class="traversal-result">
+                        {% for level in traversals.levelorder[:5] %}
+                        <div class="level-group">
+                            <span class="level-label">Nivel {{ loop.index0 }}:</span>
+                            {% for score, data in level %}
+                            <span class="node-badge {% if score <= 30 %}badge-low{% elif score <= 70 %}badge-medium{% else %}badge-high{% endif %}">
+                                {{ score }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        {% if traversals.levelorder|length > 5 %}
+                        <span class="more-badge">+{{ traversals.levelorder|length - 5 }} niveles mas</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Distribucion de Riesgo -->
+        <section class="bst-distribution">
+            <h2>Distribucion de Riesgo</h2>
+            <p class="section-description">Clasificacion de clientes segun su nivel de riesgo crediticio</p>
+
+            <div class="distribution-cards">
+                <div class="dist-card dist-low">
+                    <div class="dist-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Riesgo Bajo</h3>
+                    <p class="dist-range">Score: 0 - 30</p>
+                    <p class="dist-value">{{ distribution.bajo }}</p>
+                    <p class="dist-label">clientes</p>
+                </div>
+                <div class="dist-card dist-medium">
+                    <div class="dist-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <h3>Riesgo Medio</h3>
+                    <p class="dist-range">Score: 31 - 70</p>
+                    <p class="dist-value">{{ distribution.medio }}</p>
+                    <p class="dist-label">clientes</p>
+                </div>
+                <div class="dist-card dist-high">
+                    <div class="dist-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h3>Riesgo Alto</h3>
+                    <p class="dist-range">Score: 71 - 100</p>
+                    <p class="dist-value">{{ distribution.alto }}</p>
+                    <p class="dist-label">clientes</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Busqueda en Rango -->
+        <section class="bst-search">
+            <h2>Busqueda en Rango</h2>
+            <p class="section-description">Encuentra clientes dentro de un rango de riesgo especifico - Complejidad O(log n + k)</p>
+
+            <form class="search-form" action="/arbol" method="GET">
+                <div class="search-inputs">
+                    <div class="input-group">
+                        <label for="min_score">Score Minimo</label>
+                        <input type="number" id="min_score" name="min_score" min="0" max="100" value="{{ range_min }}" placeholder="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="max_score">Score Maximo</label>
+                        <input type="number" id="max_score" name="max_score" min="0" max="100" value="{{ range_max }}" placeholder="100">
+                    </div>
+                    <button type="submit" class="btn-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                        Buscar
+                    </button>
+                </div>
+            </form>
+
+            {% if range_results %}
+            <div class="search-results">
+                <h3>Resultados: {{ range_results|length }} clientes encontrados</h3>
+                <div class="results-grid">
+                    {% for score, data in range_results[:12] %}
+                    <div class="result-item {% if score <= 30 %}result-low{% elif score <= 70 %}result-medium{% else %}result-high{% endif %}">
+                        <span class="result-score">{{ score }}</span>
+                        <span class="result-label">Score</span>
+                    </div>
+                    {% endfor %}
+                    {% if range_results|length > 12 %}
+                    <div class="result-item result-more">
+                        <span class="result-score">+{{ range_results|length - 12 }}</span>
+                        <span class="result-label">mas</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Complejidad Algoritmica -->
+        <section class="bst-complexity">
+            <h2>Complejidad Algoritmica del BST</h2>
+            <div class="complexity-grid">
+                <div class="complexity-card">
+                    <h3>Busqueda</h3>
+                    <p class="complexity-value">O(log n)</p>
+                    <p class="complexity-desc">Caso promedio</p>
+                </div>
+                <div class="complexity-card">
+                    <h3>Insercion</h3>
+                    <p class="complexity-value">O(log n)</p>
+                    <p class="complexity-desc">Caso promedio</p>
+                </div>
+                <div class="complexity-card">
+                    <h3>Eliminacion</h3>
+                    <p class="complexity-value">O(log n)</p>
+                    <p class="complexity-desc">Caso promedio</p>
+                </div>
+                <div class="complexity-card">
+                    <h3>Recorrido</h3>
+                    <p class="complexity-value">O(n)</p>
+                    <p class="complexity-desc">Todos los nodos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Script D3.js para visualizacion -->
+        <script>
+            // Datos del arbol desde Flask
+            var treeData = {{ tree_json | safe }};
+
+            // Configuracion del SVG
+            var margin = {top: 40, right: 40, bottom: 40, left: 40};
+            var width = document.getElementById('tree-visualization').clientWidth - margin.left - margin.right;
+            var height = 400 - margin.top - margin.bottom;
+
+            // Crear SVG
+            var svg = d3.select("#tree-visualization")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Crear layout del arbol
+            var treeLayout = d3.tree().size([width, height]);
+
+            // Crear jerarquia
+            var root = d3.hierarchy(treeData);
+
+            // Aplicar layout
+            treeLayout(root);
+
+            // Funcion para obtener color segun riesgo
+            function getRiskColor(score) {
+                if (score <= 30) return "#2ecc71";
+                if (score <= 70) return "#f39c12";
+                return "#e74c3c";
+            }
+
+            // Dibujar enlaces
+            svg.selectAll(".link")
+                .data(root.links())
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("fill", "none")
+                .attr("stroke", "rgba(255, 255, 255, 0.3)")
+                .attr("stroke-width", 2)
+                .attr("d", d3.linkVertical()
+                    .x(d => d.x)
+                    .y(d => d.y));
+
+            // Dibujar nodos
+            var nodes = svg.selectAll(".node")
+                .data(root.descendants())
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .attr("transform", d => "translate(" + d.x + "," + d.y + ")");
+
+            // Circulos de los nodos
+            nodes.append("circle")
+                .attr("r", 20)
+                .attr("fill", d => getRiskColor(d.data.key))
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 2)
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    d3.select(this).attr("r", 25);
+                })
+                .on("mouseout", function(event, d) {
+                    d3.select(this).attr("r", 20);
+                });
+
+            // Texto de los nodos
+            nodes.append("text")
+                .attr("dy", 5)
+                .attr("text-anchor", "middle")
+                .attr("fill", "#fff")
+                .attr("font-size", "12px")
+                .attr("font-weight", "bold")
+                .text(d => d.data.key);
+
+            // Tabs de recorridos
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.traversal-panel').forEach(p => p.classList.remove('active'));
+
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+        </script>
+
+        {% else %}
+        <!-- Estado Vacio -->
+        <section class="bst-empty">
+            <div class="empty-container">
+                <div class="empty-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                </div>
+                <h3>No hay datos disponibles</h3>
+                <p>No hay datos procesados para construir el arbol.<br>Ejecuta el pipeline de procesamiento primero.</p>
+                <div class="empty-actions">
+                    <a href="/" class="btn-secondary">Ir al Inicio</a>
+                    <a href="/predict" class="btn-primary">Hacer Prediccion</a>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Navegacion inferior -->
+        <section class="bst-navigation">
+            <a href="/dashboard" class="nav-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="/predict" class="nav-btn nav-btn-gradient">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span>Nueva Prediccion</span>
+            </a>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 Credit Risk Prediction System - Arboles de Busqueda</p>
+    </footer>
+</body>
+
+</html>

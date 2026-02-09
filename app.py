@@ -3,11 +3,14 @@ Aplicacion Flask para el Sistema de Prediccion de Riesgo Crediticio
 """
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
+import numpy as np
 import joblib
+import json
 import config
 from src.data_processing import DataProcessor
 from src.model import CreditRiskModel
 from src.visualizations import CreditRiskVisualizer
+from src.data_structures import CreditRiskBST
 import os
 
 # Inicializar Flask
@@ -131,7 +134,7 @@ def api_predict():
 
 @app.route('/stats')
 def stats():
-    """Estad�sticas del dataset"""
+    """Estadisticas del dataset"""
     try:
         df = pd.read_csv(config.PROCESSED_DATA_FILE)
 
@@ -146,6 +149,112 @@ def stats():
         return render_template('stats.html', stats=stats)
     except Exception as e:
         return render_template('error.html', error=str(e))
+
+
+@app.route('/arbol')
+def arbol():
+    """Pagina de demostracion del Arbol Binario de Busqueda"""
+    try:
+        # Intentar cargar datos procesados, si no existen usar datos raw
+        if os.path.exists(config.PROCESSED_DATA_FILE):
+            df = pd.read_csv(config.PROCESSED_DATA_FILE)
+        elif os.path.exists(config.RAW_DATA_FILE):
+            df = pd.read_csv(config.RAW_DATA_FILE)
+            # Limpiar datos basicos (eliminar nulos)
+            df = df.dropna()
+        else:
+            raise FileNotFoundError("No se encontraron archivos de datos")
+
+        # Crear scores de riesgo simulados basados en loan_status y otras features
+        # Score de riesgo: 0-100 (mayor = mas riesgo)
+        np.random.seed(42)
+
+        # Calcular score basado en features relevantes
+        risk_scores = []
+        for idx, row in df.iterrows():
+            base_score = row['loan_status'] * 50  # 0 o 50 segun default
+            # Ajustar por tasa de interes (normalizada)
+            interest_factor = min(row['loan_int_rate'] / 25 * 30, 30)
+            # Ajustar por porcentaje de ingreso
+            income_factor = min(row['loan_percent_income'] * 50, 20)
+            # Agregar variacion aleatoria
+            noise = np.random.uniform(-5, 5)
+
+            score = base_score + interest_factor + income_factor + noise
+            score = max(0, min(100, score))  # Limitar entre 0 y 100
+            risk_scores.append(int(score))
+
+        # Construir el BST con una muestra de datos (para visualizacion)
+        sample_size = min(50, len(df))
+        sample_indices = np.random.choice(len(df), sample_size, replace=False)
+
+        bst = CreditRiskBST()
+        for idx in sample_indices:
+            score = risk_scores[idx]
+            client_data = {
+                'index': int(idx),
+                'loan_amnt': float(df.iloc[idx]['loan_amnt']),
+                'income': float(df.iloc[idx]['person_income'])
+            }
+            bst.insert_client(score, client_data)
+
+        # Obtener parametros de busqueda en rango
+        range_min = request.args.get('min_score', 0, type=int)
+        range_max = request.args.get('max_score', 100, type=int)
+
+        # Busqueda en rango
+        range_results = bst.range_search(range_min, range_max)
+
+        # Estadisticas del arbol
+        tree_stats = {
+            'total_nodes': bst.size(),
+            'height': bst.height(),
+            'min_risk': bst.find_min().key if not bst.is_empty() else 0,
+            'max_risk': bst.find_max().key if not bst.is_empty() else 0
+        }
+
+        # Recorridos
+        traversals = {
+            'inorder': bst.inorder(),
+            'preorder': bst.preorder(),
+            'postorder': bst.postorder(),
+            'levelorder': bst.level_order()
+        }
+
+        # Distribucion de riesgo
+        distribution = bst.get_risk_distribution()
+
+        # Convertir arbol a JSON para D3.js
+        def tree_to_dict(node):
+            if node is None:
+                return None
+            result = {
+                'key': node.key,
+                'data': node.data
+            }
+            children = []
+            if node.left:
+                children.append(tree_to_dict(node.left))
+            if node.right:
+                children.append(tree_to_dict(node.right))
+            if children:
+                result['children'] = children
+            return result
+
+        tree_json = json.dumps(tree_to_dict(bst.root))
+
+        return render_template('arbol.html',
+                               tree_data=True,
+                               tree_json=tree_json,
+                               stats=tree_stats,
+                               traversals=traversals,
+                               distribution=distribution,
+                               range_results=range_results,
+                               range_min=range_min,
+                               range_max=range_max)
+
+    except Exception as e:
+        return render_template('arbol.html', tree_data=False, error=str(e))
 
 
 if __name__ == '__main__':
